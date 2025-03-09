@@ -1,14 +1,24 @@
-import requests
-from bs4 import BeautifulSoup
 
-url = "https://www.example.com/articles"
-headers = {"User-Agent": "Mozilla/5.0"}  # Helps avoid blocks
+from scrapers.selenium_scraper import scrape_dynamic_site
+from processing.data_cleaning import clean_data
+from processing.duplicate_removal import remove_duplicates
+from export.export_bibtex import export_bibtex
+from export.export_ris import export_ris
 
-response = requests.get(url, headers=headers)
-soup = BeautifulSoup(response.text, "html.parser")
+def main():
+    
+    selenium_data = scrape_dynamic_site("https://example.com/js-research")
 
-articles = soup.find_all("h2", class_="article-title")
-for article in articles:
-    title = article.text.strip()
-    link = article.find("a")["href"]
-    print(f"Title: {title}, Link: {link}")
+    # 2. Combine & Clean data
+    all_data =  selenium_data
+    cleaned_data = clean_data(all_data)
+
+    # 3. Remove duplicates
+    unique_data = remove_duplicates(cleaned_data)
+
+    # 4. Export data
+    export_bibtex(unique_data, "bibliography.bib")
+    export_ris(unique_data, "bibliography.ris")
+
+if __name__ == "__main__":
+    main()
