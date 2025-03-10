@@ -7,26 +7,30 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from bibtexparser import loads
 
 # Configuración
 EMAIL = os.getenv("EMAIL")
-PASSWORD =  os.getenv("PASSWORD")
+PASSWORD = os.getenv("PASSWORD")
 LOGIN_URL = "https://www-sciencedirect-com.crai.referencistas.com/search?qs=computational%20thinking"
-DOWNLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "..", "downloads")
+
+
+
+DOWNLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "..", "downloads")  # ✅ Ensure correct path
+
+chrome_options = Options()
+chrome_options.add_experimental_option("prefs", {
+    "download.default_directory": os.path.abspath(DOWNLOAD_FOLDER),  # ✅ Ensure absolute path
+    "download.prompt_for_download": False,  # ✅ Disable Save As dialog
+    "download.directory_upgrade": True,  # ✅ Allow changing directories
+    "safebrowsing.enabled": True,  # ✅ Enable safe browsing
+    "profile.default_content_settings.popups": 0,  # ✅ Disable pop-ups
+    "profile.default_content_setting_values.automatic_downloads": 1  # ✅ Allow multiple downloads
+})
 
 # Crear carpeta de descargas si no existe
 if not os.path.exists(DOWNLOAD_FOLDER):
     os.makedirs(DOWNLOAD_FOLDER)
 
-# Configurar opciones de Chrome
-chrome_options = Options()
-chrome_options.add_experimental_option("prefs", {
-    "download.default_directory": DOWNLOAD_FOLDER,
-    "download.prompt_for_download": False,
-    "download.directory_upgrade": True,
-    "safebrowsing.enabled": True
-})
 
 # Iniciar WebDriver
 driver = webdriver.Chrome(options=chrome_options)
@@ -63,38 +67,56 @@ def login():
         password_input = driver.find_element(By.NAME, "Passwd")
         password_input.send_keys(PASSWORD)
         password_input.send_keys(Keys.RETURN)
-        time.sleep(120)  # Esperar redirección después del login
+        time.sleep(15)  # Esperar redirección después del login
     except Exception as e:
         print(f"Error en el proceso de login de Google: {e}")
-
 
 def download_bibtex():
     """Find and click the BibTeX download button."""
     try:
+        driver.current_url
+
         time.sleep(2)  # Wait for the page to load
+        checkbox = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "select-all-results"))
+        )
 
-        check = driver.find_element(By.ID, "select-all-results")
-        
+        # Scroll to the checkbox
+        driver.execute_script("arguments[0].scrollIntoView();", checkbox)
 
-         # Use JavaScript to click the checkbox
-        driver.execute_script("arguments[0].click();", check)
+         # Click the checkbox using JavaScript to ensure it works
+        driver.execute_script("arguments[0].click();", checkbox)
+    
+        print("✅ Checkbox clicked successfully!")
+
+        # Wait for the "Export" button to be clickable
+        export_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "export-all-link-button"))
+        )
+
+        # Scroll to the button to ensure visibility
+        driver.execute_script("arguments[0].scrollIntoView();", export_button)
+
+        # Click the button
+        export_button.click()
+
+        print("✅ Export button clicked successfully!")
 
         time.sleep(2)
 
-        openModal = WebDriverWait(driver, 2).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, ".button-link.export-all-link-button"))
-    )   
-        openModal.click()
 
-        time.sleep(2)
+            # Wait for the modal and the BibTeX button to appear
+        bibtex_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[.//span[contains(text(), 'Export citation to BibTeX')]]"))
+        )
 
-        downloadBibtex = WebDriverWait(driver,2).until(
-            EC.element_to_be_clickable((By.CLASS_NAME, ".button-link-text"))
-        )    
+        # Scroll into view (just in case)
+        driver.execute_script("arguments[0].scrollIntoView();", bibtex_button)
 
-        downloadBibtex.click()
+        # Click the button
+        bibtex_button.click()
 
-
+        print("✅ BibTeX export button clicked successfully!")
 
         print("✅ Download initiated...")
 
@@ -107,6 +129,7 @@ def download_bibtex():
 
 def wait_for_download():
     """Espera hasta que el archivo BibTeX aparezca en la carpeta de descargas"""
+    print("is arriving at this function")
     timeout = 30
     start_time = time.time()
     while time.time() - start_time < timeout:
@@ -117,27 +140,11 @@ def wait_for_download():
         time.sleep(1)
     print("Tiempo de espera agotado. No se encontró el archivo.")
 
-def process_bibtex():
-    """Busca y procesa el archivo BibTeX más reciente"""
-    files = [f for f in os.listdir(DOWNLOAD_FOLDER) if f.endswith(".bib")]
-    if not files:
-        print("No se encontraron archivos BibTeX.")
-        return
-    latest_file = max(files, key=lambda f: os.path.getctime(os.path.join(DOWNLOAD_FOLDER, f)))
-    bib_path = os.path.join(DOWNLOAD_FOLDER, latest_file)
-    with open(bib_path, "r", encoding="utf-8") as bibtex_file:
-        bib_database = loads(bibtex_file.read())
-    for entry in bib_database.entries:
-        print(f"Título: {entry.get('title', 'N/A')}")
-        print(f"Autores: {entry.get('author', 'N/A')}")
-        print(f"Año: {entry.get('year', 'N/A')}")
-        print(f"DOI: {entry.get('doi', 'N/A')}")
-        print("-" * 40)
 
 if __name__ == "__main__":
     try:
         login()
         download_bibtex()
-        process_bibtex()
+        wait_for_download()
     finally:
         driver.quit()
