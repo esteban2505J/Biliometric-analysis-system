@@ -1,5 +1,5 @@
 
-from scrapers.selenium_scraper import scrape_dynamic_site
+from scrapers.science_direct_scraper import scrape_dynamic_site
 from processing.data_cleaning import clean_data
 from processing.duplicate_removal import remove_duplicates
 from export.export_bibtex import export_bibtex
