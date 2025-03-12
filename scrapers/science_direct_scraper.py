@@ -8,171 +8,144 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
-DOWNLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "..", "downloads")  # ✅ Ensure correct path
-
-chrome_options = Options()
-chrome_options.add_experimental_option("prefs", {
-    "download.default_directory": os.path.abspath(DOWNLOAD_FOLDER),  # ✅ Ensure absolute path
-    "download.prompt_for_download": False,  # ✅ Disable Save As dialog
-    "download.directory_upgrade": True,  # ✅ Allow changing directories
-    "safebrowsing.enabled": True,  # ✅ Enable safe browsing
-    "profile.default_content_settings.popups": 0,  # ✅ Disable pop-ups
-    "profile.default_content_setting_values.automatic_downloads": 1  # ✅ Allow multiple downloads
-})
-
-# Crear carpeta de descargas si no existe
+# Configure Download Folder
+DOWNLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "..", "downloads")
 if not os.path.exists(DOWNLOAD_FOLDER):
     os.makedirs(DOWNLOAD_FOLDER)
 
-
+# Configure Chrome Options
+chrome_options = Options()
+chrome_options.add_experimental_option("prefs", {
+    "download.default_directory": os.path.abspath(DOWNLOAD_FOLDER),
+    "download.prompt_for_download": False,
+    "download.directory_upgrade": True,
+    "safebrowsing.enabled": True,
+    "profile.default_content_settings.popups": 0,
+    "profile.default_content_setting_values.automatic_downloads": 1
+})
 
 def scrape_science_direct():
-
-
-    # Configuración
+    """Scrapes ScienceDirect, downloads BibTeX files, and iterates through pages."""
+    
+    # Load environment variables
     EMAIL = os.getenv("EMAIL")
     PASSWORD = os.getenv("PASSWORD")
-
     LOGIN_URL = "https://www-sciencedirect-com.crai.referencistas.com/search?qs=computational%20thinking"
 
-    # Iniciar WebDriver
+    # Start WebDriver
     driver = webdriver.Chrome(options=chrome_options)
-
-    #-----------------------------------LOGIN----------------------------------------
-
-    """ Función para autenticarse en ScienceDirect usando Google """
     driver.get(LOGIN_URL)
-    time.sleep(3)  # Esperar a que cargue la página
+    time.sleep(3)
 
+    # ----------------------------------- LOGIN -----------------------------------
     try:
-        # Hacer clic en el botón "Iniciar sesión con Google"
         google_login_button = driver.find_element(By.ID, "btn-google")
         google_login_button.click()
-        time.sleep(3)  # Esperar a que aparezca la ventana de Google
-    except Exception as e:
-        print(f"Error al hacer clic en el botón de Google: {e}")
-        return
+        time.sleep(3)
 
-    # Cambiar a la nueva ventana emergente de Google (si existe)
-    main_window = driver.current_window_handle
-    for handle in driver.window_handles:
-        if handle != main_window:
-            driver.switch_to.window(handle)
-            break
+        main_window = driver.current_window_handle
+        for handle in driver.window_handles:
+            if handle != main_window:
+                driver.switch_to.window(handle)
+                break
 
-    try:
-        # Introducir el email
         email_input = driver.find_element(By.ID, "identifierId")
         email_input.send_keys(EMAIL)
         email_input.send_keys(Keys.RETURN)
-        time.sleep(3)  # Esperar a que cargue la página de contraseña
+        time.sleep(3)
 
-        # Introducir la contraseña
         password_input = driver.find_element(By.NAME, "Passwd")
         password_input.send_keys(PASSWORD)
         password_input.send_keys(Keys.RETURN)
-        time.sleep(15)  # Esperar redirección después del login
+        time.sleep(15)
+
     except Exception as e:
-        print(f"Error en el proceso de login de Google: {e}")
-    #------------------------------------------FIN LOGIN----------------------------------------------------
+        print(f"❌ Error during login: {e}")
+        driver.quit()
+        return
 
-
-        driver.current_url
-
-    # Extract total number of pages
-        pagination_text = driver.find_element(By.XPATH, "//ol[@id='srp-pagination']/li[1]").text
-        total_pages = int(pagination_text.split(" of ")[1])
-        print(f"✅ Total pages: {total_pages}")
-
-    for page in range(1, total_pages):
-
-        # Find and click the "100 results per page" link
+    # ----------------------------------- SELECT 100 RESULTS (ONLY ONCE) -----------------------------------
+    try:
         results_100 = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'show=100')]"))
         )
         results_100.click()
-        #------------------------------------------EXTRACT DATA--------------------------------------------------
-        checkbox = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "select-all-results"))
-        )
-         # Scroll to the checkbox
-        driver.execute_script("arguments[0].scrollIntoView();", checkbox)
-
-         # Click the checkbox using JavaScript to ensure it works
-        driver.execute_script("arguments[0].click();", checkbox)
-    
-        print("✅ Checkbox clicked successfully!")
-
-        # Wait for the "Export" button to be clickable
-        export_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.CLASS_NAME, "export-all-link-button"))
-        )
-
-        # Scroll to the button to ensure visibility
-        driver.execute_script("arguments[0].scrollIntoView();", export_button)
-
-        # Click the button
-        export_button.click()
-
-        print("✅ Export button clicked successfully!")
-
+        print("✅ Results set to 100 per page!")
         time.sleep(2)
+    except:
+        print("⚠️ 100 results per page already selected or not found.")
 
-        # Wait for the modal and the BibTeX button to appear
-        bibtex_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[.//span[contains(text(), 'Export citation to BibTeX')]]"))
-        )
+    # ----------------------------------- PAGINATION & DATA EXTRACTION -----------------------------------
+    try:
+        pagination_text = driver.find_element(By.XPATH, "//ol[@id='srp-pagination']/li[1]").text
+        total_pages = int(pagination_text.split(" of ")[1])
+        print(f"✅ Total pages: {total_pages}")
 
-        # Scroll into view (just in case)
-        driver.execute_script("arguments[0].scrollIntoView();", bibtex_button)
+        for page in range(1, total_pages + 1):  
+            try:
 
-        # Click the button
-        bibtex_button.click()
+                time.sleep(2)    
 
-        print("✅ BibTeX export button clicked successfully!")
+                # ✅ Select all results
+                checkbox = WebDriverWait(driver, 3).until(
+                    EC.presence_of_element_located((By.ID, "select-all-results"))
+                )
+                driver.execute_script("arguments[0].scrollIntoView();", checkbox)
+                driver.execute_script("arguments[0].click();", checkbox)
+                print(f"✅ Page {page}: Selected all articles!")
 
-        print("✅ Download initiated...")
+                time.sleep(2)
 
-        # Wait for download confirmation
-        time.sleep(5)
+                # ✅ Click "Export" button
+                export_button = WebDriverWait(driver, 3).until(
+                    EC.element_to_be_clickable((By.CLASS_NAME, "export-all-link-button"))
+                )
+                export_button.click()
+                time.sleep(2)
 
-        #------------------------------------------ NEXT PAGE --------------------------------------------------
-
-         # Wait for the "Next Page" link to be clickable
-        next_page = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//a[@data-aa-name='srp-next-page']"))
-        )
-
-        # Scroll into view (optional)
-        driver.execute_script("arguments[0].scrollIntoView();", next_page)
-
-        # Click the "Next Page" link
-        next_page.click()
-        time.sleep(2)
-        print("✅ Next Page clicked successfully!")
-        #------------------------------------------ END NEXT PAGE --------------------------------------------------
-
-
-    #------------------------------------------VERIFY DATA --------------------------------------------------
-    """Espera hasta que el archivo BibTeX aparezca en la carpeta de descargas"""
-    print("is arriving at this function")
-    timeout = 30
-    start_time = time.time()
-    while time.time() - start_time < timeout:
-        files = [f for f in os.listdir(DOWNLOAD_FOLDER) if f.endswith(".bib")]
-        if files:
-            print("Archivo BibTeX descargado.")
-            return
-        time.sleep(1)
-    print("Tiempo de espera agotado. No se encontró el archivo.")
+                # ✅ Click "Export citation to BibTeX"
+                bibtex_button = WebDriverWait(driver, 3).until(
+                    EC.element_to_be_clickable((By.XPATH, "//button[.//span[contains(text(), 'Export citation to BibTeX')]]"))
+                )
+                bibtex_button.click()
+                print("✅ BibTeX export started!")
+                time.sleep(3)  # Wait for the download
     
+
+                # ✅ Select all results
+                checkbox = WebDriverWait(driver, 3).until(
+                    EC.presence_of_element_located((By.ID, "select-all-results"))
+                )
+                driver.execute_script("arguments[0].scrollIntoView();", checkbox)
+                driver.execute_script("arguments[0].click();", checkbox)
+                print(f"✅ Page {page}: Selected all articles!")
+
+                time.sleep(2)
+
+                # ✅ Click "Next Page" if available
+                try:
+                    next_page = WebDriverWait(driver, 3).until(
+                        EC.element_to_be_clickable((By.XPATH, "//a[@data-aa-name='srp-next-page']"))
+                    )
+                    driver.execute_script("arguments[0].scrollIntoView();", next_page)
+                    next_page.click()
+                    print(f"✅ Moved to page {page + 1}")
+                    time.sleep(3)
+
+                except:
+                    print("⚠️ No 'Next Page' button found. Reached last page.")
+                    break  # Stop the loop
+
+            except Exception as e:
+                print(f"❌ Error on page {page}: {e}")
+                break  # Stop the loop on error
+
+    except Exception as e:
+        print(f"❌ Error extracting pagination: {e}")
+
+    # ✅ Close the driver **only after processing all pages**
     driver.quit()
-
-    #------------------------------------------END VERIFY DATA --------------------------------------------------
+    print("✅ Scraping complete!")
 
 if __name__ == "__main__":
     scrape_science_direct()
-      
-
-       
