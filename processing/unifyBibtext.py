@@ -8,11 +8,16 @@ folder_paths = [
     r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\downloads\IEE"
 ]
 
-# Archivos de salida
-output_cleaned = "unified_cleaned.bib"
-output_duplicates = "duplicates.bib"
 
-# Campos requeridos por tipo de entrada
+# Carpeta de salida
+output_folder = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\output"
+
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)  # Crea la carpeta si no existe
+
+# Archivos de salida en la carpeta deseada
+output_cleaned = os.path.join(output_folder, "unified_cleaned.bib")
+output_duplicates = os.path.join(output_folder, "duplicates.bib")
 required_fields = {
     "article": ["title", "author", "journal", "year", "doi"],
     "inproceedings": ["title", "author", "booktitle", "year", "doi"],
