@@ -82,6 +82,7 @@ def save_bibtex_file(entries, output_file):
     else:
         print(f"⚠️ No hay entradas para guardar en {output_file}")
 
+
 if __name__ == "__main__":
     all_entries = load_bibtex_files(folder_paths)
     

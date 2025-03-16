@@ -1,24 +1,37 @@
+import subprocess
+import threading
+import sys
 
-from scrapers.science_direct_scraper import scrape_dynamic_site
-from processing.data_cleaning import clean_data
-from processing.duplicate_removal import remove_duplicates
-from export.export_bibtex import export_bibtex
-from export.export_ris import export_ris
+# Paths to your scraper scripts
+scraper1 = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\scrapers\IEE_screper.py"
+scraper2 = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\scrapers\sage_scraper.py"
+scraper3 = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\scrapers\science_direct_scraper.py"
 
-def main():
-    
-    selenium_data = scrape_dynamic_site("https://example.com/js-research")
+# Path to your processing script
+processing_script = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\processing\unifyBibtext.py"
 
-    # 2. Combine & Clean data
-    all_data =  selenium_data
-    cleaned_data = clean_data(all_data)
+def run_scraper(script):
+    """Runs a scraper script using the Python interpreter from the virtual environment."""
+    subprocess.run([sys.executable, script], check=True)
 
-    # 3. Remove duplicates
-    unique_data = remove_duplicates(cleaned_data)
+# Run all scrapers concurrently using threads
+threads = [
+    threading.Thread(target=run_scraper, args=(scraper1,)),
+    threading.Thread(target=run_scraper, args=(scraper2,)),
+    threading.Thread(target=run_scraper, args=(scraper3,))
+]
 
-    # 4. Export data
-    export_bibtex(unique_data, "bibliography.bib")
-    export_ris(unique_data, "bibliography.ris")
+# Start all scrapers
+for thread in threads:
+    thread.start()
 
-if __name__ == "__main__":
-    main()
+# Wait until all scrapers finish
+for thread in threads:
+    thread.join()
+
+print("✅ All scrapers finished. Starting processing...")
+
+# Run the processing script after scrapers complete
+subprocess.run([sys.executable, processing_script], check=True)
+
+print("✅ Processing complete!")
