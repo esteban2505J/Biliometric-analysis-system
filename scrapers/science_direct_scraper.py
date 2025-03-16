@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 # Configure Download Folder
-DOWNLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "..", "downloads")
+DOWNLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "..", "downloads/science")
 if not os.path.exists(DOWNLOAD_FOLDER):
     os.makedirs(DOWNLOAD_FOLDER)
 
