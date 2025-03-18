@@ -28,10 +28,17 @@ for thread in threads:
 # Wait until all scrapers finish
 for thread in threads:
     thread.join()
+    thread.join()
 
 print("✅ All scrapers finished. Starting processing...")
 
 # Run the processing script after scrapers complete
 subprocess.run([sys.executable, processing_script], check=True)
+
+#Path: 
+
+processing_graph= "./processing/porcess.py"
+
+subprocess.run([sys.executable, processing_graph], check=True)
 
 print("✅ Processing complete!")
