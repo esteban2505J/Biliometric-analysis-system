@@ -137,6 +137,10 @@ def main():
 
         tiempos_ms = tiempos  # Ya están en milisegundos
         
+        
+        return tiempos_ms
+        
+        
         bars = plt.bar(tiempos_ms.keys(), tiempos_ms.values(), color='skyblue')
 
 

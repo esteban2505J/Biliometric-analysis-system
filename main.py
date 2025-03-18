@@ -37,7 +37,7 @@ subprocess.run([sys.executable, processing_script], check=True)
 
 #Path: 
 
-processing_graph= "./processing/porcess.py"
+processing_graph= "./processing/process.py"
 
 subprocess.run([sys.executable, processing_graph], check=True)
 
