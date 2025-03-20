@@ -376,6 +376,7 @@ def main(contenido_bibtex):
             tiempo, error = medir_tiempo(algoritmo, datos, nombre_alg, categoria)
             resultados[categoria][nombre_alg] = (tiempo, error)
             
+            
             if tiempo is not None:
                 print(f" {tiempo:.2f} ms")
             else:
