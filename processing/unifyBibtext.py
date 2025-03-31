@@ -19,9 +19,9 @@ if not os.path.exists(output_folder):
 output_cleaned = os.path.join(output_folder, "unified_cleaned.bib")
 output_duplicates = os.path.join(output_folder, "duplicates.bib")
 required_fields = {
-    "article": ["title", "author", "journal", "year", "doi"],
-    "inproceedings": ["title", "author", "booktitle", "year", "doi"],
-    "book": ["title", "author", "publisher", "year", "isbn"],
+    "article": ["title", "author", "journal", "year", "doi","abstract"],
+    "inproceedings": ["title", "author", "booktitle", "year", "doi","abstract"],
+    "book": ["title", "author", "publisher", "year", "isbn","abstract"],
 }
 
 def load_bibtex_files(folder_paths):
