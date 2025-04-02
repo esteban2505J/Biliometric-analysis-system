@@ -1,4 +1,3 @@
-#import count_words
 from algorithms.search_algorithms.prefix_trie import count_words_abstracts
 
 # Algorithms imported
@@ -17,15 +16,14 @@ from algorithms.radix_sort import radix_sort
 
 # Import utils functions
 from measure_time.measure_time_algoriths import measure_algorithm_time
-
+#from graphics.create.create_graphics import create_graphs, create_graphs_words
 
 def main():
     file_path = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\output\unified_cleaned.bib"
     
-    # Llamar la función correctamente
+    # Obtener el conteo de palabras
     counted_words = count_words_abstracts(file_path)
     
-    # Verificar si counted_words es un diccionario
     if not isinstance(counted_words, dict):
         print("El resultado de count_words_abstracts no es un diccionario.")
         return
@@ -33,6 +31,13 @@ def main():
     # Obtener solo las frecuencias en una lista
     word_frequencies = list(counted_words.values())
 
+    # Diccionario inverso {frecuencia: [palabras]}
+    frequency_to_words = {}
+    for word, freq in counted_words.items():
+        if freq not in frequency_to_words:
+            frequency_to_words[freq] = []
+        frequency_to_words[freq].append(word)
+    
     # Definir algoritmos a probar
     algoritmos = {
         "TimSort": tim_sort,
@@ -55,11 +60,11 @@ def main():
     for nombre_alg, algoritmo in algoritmos.items():
         print(f"\nEjecutando {nombre_alg}...")
 
-        # Crear copia de la lista original para evitar modificarla
+        # Copia de la lista original para evitar modificarla
         frequencies_copy = word_frequencies[:]
 
         try:
-            # Aplicar el algoritmo de ordenamiento sobre la lista de frecuencias
+            # Aplicar el algoritmo de ordenamiento
             sorted_frequencies = algoritmo(frequencies_copy)
 
             # Medir tiempo de ejecución
@@ -71,13 +76,17 @@ def main():
                 "error": error
             }
 
-            # Recuperar las palabras correspondientes a las frecuencias ordenadas
-            sorted_words = sorted(counted_words.items(), key=lambda x: x[1], reverse=True)
+            # Reconstruir la lista de palabras en el orden del algoritmo
+            sorted_words = [(word, freq) for freq in sorted_frequencies for word in frequency_to_words[freq]]
 
             # Mostrar los resultados ordenados
             print(f"{'Palabra':<20} | {'Frecuencia'}")
             print("-" * 30)
-            for word, freq in sorted_words[:10]:  # Mostrar solo las 10 más frecuentes
+            
+            # # Crear las gráficas
+            # create_graphs_words(sorted_words)
+    
+            for word, freq in sorted_words[:15]:  # Mostrar solo las 15 más frecuentes
                 print(f"{word:<20} | {freq}")
 
             if tiempo is not None:
