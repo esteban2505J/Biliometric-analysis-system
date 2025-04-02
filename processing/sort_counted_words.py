@@ -13,6 +13,8 @@ from algorithms.bitonic_sort import bitonic_sort
 from algorithms.gnome_sort import gnome_sort
 from algorithms.binary_insertion_sort import binary_insertion_sort
 from algorithms.radix_sort import radix_sort
+from algorithms.bubble_sort import bubble_sort
+from algorithms.cocktail_shaker_sort import cocktail_shaker_sort
 
 # Import utils functions
 from measure_time.measure_time_algoriths import measure_algorithm_time
@@ -51,7 +53,9 @@ def main():
         "BitonicSort": bitonic_sort,
         "GnomeSort": gnome_sort,
         "BinaryInsertionSort": binary_insertion_sort,
-        "RadixSort": radix_sort
+        "RadixSort": radix_sort,
+        "BubbleSort": bubble_sort,
+        "Cocktail_shaker_sort": cocktail_shaker_sort
     }
 
     resultados = {}
@@ -90,7 +94,7 @@ def main():
                 print(f"{word:<20} | {freq}")
 
             if tiempo is not None:
-                print(f"\nTiempo de ejecución: {tiempo:.2f} ms\n")
+                print(f"\nTiempo de ejecución: {tiempo:.2f} µs\n")
             else:
                 print(f"\nERROR: {error}\n")
 
