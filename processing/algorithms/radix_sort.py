@@ -1,4 +1,4 @@
-from _counting_sort import _counting_sort
+from algorithms._counting_sort import _counting_sort
 import copy
 
 def radix_sort(arr):

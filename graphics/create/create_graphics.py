@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def crear_graficas(resultados, categorias):
+def create_graphs(resultados, categorias):
     """Crea gráficas comparativas para los resultados de rendimiento"""
     # Crear directorio para gráficas si no existe
-    if not os.path.exists('graficas'):
-        os.makedirs('graficas')
+    if not os.path.exists('graphics'):
+        os.makedirs('graphics')
     
     # Gráfica por categoría (tipo de dato)
     for categoria, algoritmos in resultados.items():
@@ -43,7 +43,7 @@ def crear_graficas(resultados, categorias):
                    ha='center', fontsize=10, bbox={"facecolor":"white", "alpha":0.5, "pad":5})
         
         # Guardar gráfica
-        plt.savefig(f'graficas/rendimiento_{categoria}.png', dpi=300, bbox_inches='tight')
+        plt.savefig(f'graphics/rendimiento_{categoria}.png', dpi=300, bbox_inches='tight')
         plt.close()
     
     # Gráfica comparativa de todos los algoritmos en todas las categorías
@@ -80,7 +80,7 @@ def crear_graficas(resultados, categorias):
     plt.xticks(x, [f"{cat}\n({len(categorias[cat])} elementos)" for cat in categorias_nombres])
     plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
     plt.tight_layout()
-    plt.savefig('graficas/comparacion_global.png', dpi=300, bbox_inches='tight')
+    plt.savefig('graphics/comparacion_global.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     # Crear tabla de resumen
@@ -104,5 +104,5 @@ def crear_graficas(resultados, categorias):
     plt.axis('off')
     plt.title('Tabla de Tiempos de Ejecución (ms)')
     plt.tight_layout()
-    plt.savefig('graficas/tabla_tiempos.png', dpi=300, bbox_inches='tight')
+    plt.savefig('graphics/tabla_tiempos.png', dpi=300, bbox_inches='tight')
     plt.close()

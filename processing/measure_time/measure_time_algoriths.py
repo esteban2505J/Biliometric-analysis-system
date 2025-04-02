@@ -1,7 +1,7 @@
 import time
 import copy
 
-def medir_tiempo(algoritmo, datos, nombre_algoritmo, nombre_datos, n_ejecuciones=3):
+def measure_algorithm_time(algoritmo, datos, nombre_algoritmo, nombre_datos, n_ejecuciones=3):
     """Mide el tiempo de ejecución de un algoritmo con manejo de excepciones"""
     tiempos = []
     
