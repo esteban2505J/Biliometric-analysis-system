@@ -40,6 +40,7 @@ def count_words_abstracts(file_path):
     # print(results)  # Debugging output
     return results  # Returns a single dictionary
 
+
 if __name__ == "__main__":
     file_path = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\output\unified_cleaned.bib"
     

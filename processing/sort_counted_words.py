@@ -1,4 +1,12 @@
+   
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from algorithms.search_algorithms.prefix_trie import count_words_abstracts
+
+
 
 # Algorithms imported
 from algorithms.tim_sort import tim_sort
@@ -18,7 +26,8 @@ from algorithms.cocktail_shaker_sort import cocktail_shaker_sort
 
 # Import utils functions
 from measure_time.measure_time_algoriths import measure_algorithm_time
-#from graphics.create.create_graphics import create_graphs, create_graphs_words
+from graphics.create.create_graphics import create_graphs
+
 
 def main():
     file_path = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\output\unified_cleaned.bib"
@@ -80,6 +89,8 @@ def main():
                 "error": error
             }
 
+           
+            
             # Reconstruir la lista de palabras en el orden del algoritmo
             sorted_words = [(word, freq) for freq in sorted_frequencies for word in frequency_to_words[freq]]
 
@@ -87,8 +98,8 @@ def main():
             print(f"{'Palabra':<20} | {'Frecuencia'}")
             print("-" * 30)
             
-            # # Crear las gráficas
-            # create_graphs_words(sorted_words)
+            # Crear las gráficas
+            create_graphs(resultados,list(counted_words.keys()))
     
             for word, freq in sorted_words[:15]:  # Mostrar solo las 15 más frecuentes
                 print(f"{word:<20} | {freq}")
