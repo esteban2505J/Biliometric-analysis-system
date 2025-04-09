@@ -26,7 +26,7 @@ from algorithms.cocktail_shaker_sort import cocktail_shaker_sort
 
 # Import utils functions
 from measure_time.measure_time_algoriths import measure_algorithm_time
-from graphics.create.create_graphics import create_graphs
+from graphics.create.create_graphics import create_graphs,create_graphs_words
 
 
 def main():
@@ -85,12 +85,12 @@ def main():
 
             resultados[nombre_alg] = {
                 "sorted_frequencies": sorted_frequencies,
+                "word": list(counted_words.keys()),
                 "tiempo": tiempo,
                 "error": error
             }
-
-           
-            
+                      
+    
             # Reconstruir la lista de palabras en el orden del algoritmo
             sorted_words = [(word, freq) for freq in sorted_frequencies for word in frequency_to_words[freq]]
 
@@ -99,7 +99,7 @@ def main():
             print("-" * 30)
             
             # Crear las gráficas
-            create_graphs(resultados,list(counted_words.keys()))
+            create_graphs_words(resultados)
     
             for word, freq in sorted_words[:15]:  # Mostrar solo las 15 más frecuentes
                 print(f"{word:<20} | {freq}")

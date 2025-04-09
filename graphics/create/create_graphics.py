@@ -108,8 +108,7 @@ def create_graphs(resultados, categorias):
     plt.close()
     
     
-    
-    
+
 def create_graphs_words(resultados):
     # Crear directorio para guardar las gráficas si no existe
         if not os.path.exists('graphics'):
@@ -117,22 +116,43 @@ def create_graphs_words(resultados):
 
         for nombre_alg, datos in resultados.items():
             tiempo = datos["tiempo"]
+            freq = datos["sorted_frequencies"]
+            word = datos["word"]
+            
             
             if tiempo is None:
                 print(f"No se generará gráfica para {nombre_alg} debido a un error en la ejecución.")
+                
                 continue
+           
+          
             
-            # Crear gráfico de barras
-            plt.figure(figsize=(6, 4))
-            plt.bar(nombre_alg, tiempo, color='skyblue')
-            plt.ylabel("Tiempo de ejecución (ms)")
-            plt.title(f"Tiempo de ejecución de {nombre_alg}")
-            
-            # Etiqueta sobre la barra con el tiempo
-            plt.text(0, tiempo + 0.05 * tiempo, f"{tiempo:.2f} ms", ha='center', fontsize=10)
+            # Crear figura
+            plt.figure(figsize=(14, 8))
+           
+            plt.bar(word, freq, color='skyblue',edgecolor='darkblue', linewidth=0.8)
+            plt.ylabel("Frecuencia de palabras")
+            plt.xlabel("Palabras")
+            plt.title(f"{nombre_alg} - Tiempo: {tiempo:.2f} µs")
 
+            # Rotar etiquetas en eje X
+            plt.xticks(rotation=-45, fontsize=8)
+            
+            # ✅ Ajustar la escala 
+            max_freq = max(freq)
+            step = 50 if max_freq < 1000 else 100
+            plt.yticks(np.arange(0, max_freq + step, step))
+
+            # ✅ Agregar líneas horizontales para claridad
+            plt.grid(axis="y", linestyle='--', alpha=0.6)
+
+
+            # Ajustar espacio para que se vean todas las etiquetas
+            plt.tight_layout()
+
+    
             # Guardar la gráfica
-            plt.savefig(f'graphics/{nombre_alg}_tiempo.png', dpi=300, bbox_inches='tight')
+            plt.savefig(f'graphics/counted_words/{nombre_alg}_tiempo.png', dpi=300, bbox_inches='tight')
             plt.close()
     
     
