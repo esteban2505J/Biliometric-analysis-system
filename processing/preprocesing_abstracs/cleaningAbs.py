@@ -1,3 +1,8 @@
+from hierarchicalClustering import (
+    single_linkage_clustering,
+    complete_linkage_clustering,
+    plot_dendrogram)
+
 import re
 import bibtexparser
 
@@ -8,18 +13,12 @@ import string
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-# imports for clustering and similarity
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import KMeans
-
-
 
 # Inicializar stopwords y stemmer
 stop_words = set(stopwords.words('english'))
 stemmer = PorterStemmer()
-
-
-    
 
 
 def clean_text(text):
@@ -40,32 +39,30 @@ def clean_text(text):
     tokens = [stemmer.stem(word) for word in tokens]
     
     # 6. Unir tokens limpios en una cadena de nuevo
-    clean_text = ' '.join(tokens)
+    clean_text_result = ' '.join(tokens)
     
-    return clean_text
+    return clean_text_result
 
 
-    
 def main():
     with open(r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\output\unified_cleaned.bib", encoding="utf-8") as file:
         bib_content = bibtexparser.load(file)
-        
+
     abstracts = []
     for entry in bib_content.entries:
-        if 'abstract' in entry:
+        if 'abstract' in entry and entry['abstract'].strip():  # <-- Asegura que no esté vacío
             original_abstract = entry['abstract']
             cleaned_abstract = clean_text(original_abstract)
             title = entry['title']
             abstracts.append({'title': title, 'abstract': cleaned_abstract})
-            
     return abstracts
-    
-    
+
+
 def vectorize_abstracts(abstracts_cleaned):
-    abstracts = [article['abstract'] for article in abstracts_cleaned]  # extraer solo los textos
+    abstracts = [article['abstract'] for article in abstracts_cleaned]
     
-    vectorizer = TfidfVectorizer()  
-    X = vectorizer.fit_transform(abstracts) 
+    vectorizer = TfidfVectorizer()
+    X = vectorizer.fit_transform(abstracts)
     
     return X, vectorizer
 
@@ -82,42 +79,49 @@ def cluster_abstracts(X, num_clusters=5):
 
 def show_most_similar(similarities, abstracts_cleaned, top_n=5):
     n = similarities.shape[0]
-    
-    # Evitar duplicados mirando solo la parte superior de la matriz
     pairs = []
+    
     for i in range(n):
-        for j in range(i+1, n):
+        for j in range(i + 1, n):
             pairs.append((i, j, similarities[i, j]))
     
-    # Ordenar por similitud descendente
     pairs = sorted(pairs, key=lambda x: x[2], reverse=True)
     
-    # Mostrar top_n pares más similares
     for idx1, idx2, sim in pairs[:top_n]:
         print(f"\nAbstract {idx1} ({abstracts_cleaned[idx1]['title']})")
         print(f"Abstract {idx2} ({abstracts_cleaned[idx2]['title']})")
         print(f"Similitud: {sim:.4f}")
         print("-" * 80)
-        
-        
+
+
 if __name__ == "__main__":
+    # Paso 1: Cargar y limpiar abstracts
     abstracts_cleaned = main()
+    
+    # Paso 2: Vectorizar
     X, vectorizer = vectorize_abstracts(abstracts_cleaned)
     
+    # Paso 3: Calcular similitudes
     similarities = calculate_similarities(X)
+    
+    # Paso 4: Clustering con KMeans
     clusters = cluster_abstracts(X, num_clusters=5)
     
+    # Paso 5: Mostrar abstracts más similares
     show_most_similar(similarities, abstracts_cleaned, top_n=5)
+    
+    # ---- Clustering Jerárquico ----
+    Z_single = single_linkage_clustering(X)
+    Z_complete = complete_linkage_clustering(X)
 
-    # # Mostrar resultados
-    # for i, article in enumerate(abstracts_cleaned):
-    #     print(f"Título: {article['title']}")
-    #     print(f"Cluster asignado: {clusters[i]}")
-    #     print("-" * 50)
+    # Extraer títulos para los dendrogramas
+    titles = [article['title'] for article in abstracts_cleaned]
     
-        
-   
-    
-    
-            
-    
+    print(f"Número de abstracts: {len(abstracts_cleaned)}")
+    print(f"Shape de X: {X.shape}")
+    print(f"Número de títulos: {len(titles)}")
+
+    # Plot Dendrogramas
+    plot_dendrogram(Z_single, labels=titles, title='Single Linkage Dendrogram')
+    plot_dendrogram(Z_complete, labels=titles, title='Complete Linkage Dendrogram')
+
