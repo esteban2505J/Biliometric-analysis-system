@@ -1,4 +1,3 @@
-# main.py
 import warnings
 from clustering import (
     load_bibtex, preprocess_abstracts, calculate_tfidf_and_similarity,
