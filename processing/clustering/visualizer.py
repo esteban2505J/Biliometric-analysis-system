@@ -30,14 +30,20 @@ def plot_dendrogram(linkage_matrix, abstract_ids, method_name, max_d=None, color
         # Ensure output directory exists
         os.makedirs(OUTPUT_DIR, exist_ok=True)
         
-        plt.figure(figsize=(16, 10))
+        plt.figure(figsize=(20, 12))  # Increased figure size for more clusters
+        
         plt.title(f'Dendrograma Jerárquico - Método {method_name}', fontsize=20)
         
+        # Dynamically set p to at least 70% of the number of abstracts
+        n_abstracts = len(abstract_ids)
+        p = max(30, int(n_abstracts * 0.7))  # Minimum 30, but at least 70% of abstracts
+        
         labels = None
-        if len(abstract_ids) > 50:
-            labels = None
-        else:
+        if n_abstracts <= 50:
             labels = abstract_ids
+            truncate_mode = None
+        else:
+            labels = None  # Labels are omitted with truncation
         
         dendrogram(
             linkage_matrix,
@@ -46,8 +52,8 @@ def plot_dendrogram(linkage_matrix, abstract_ids, method_name, max_d=None, color
             leaf_rotation=90,
             leaf_font_size=8,
             color_threshold=color_threshold,
-            truncate_mode=truncate_mode if len(abstract_ids) > 50 else None,
-            p=p if len(abstract_ids) > 50 else None
+            truncate_mode=truncate_mode,
+            p=p if truncate_mode else None
         )
         
         if max_d:
@@ -66,7 +72,7 @@ def plot_dendrogram(linkage_matrix, abstract_ids, method_name, max_d=None, color
         print(f"Dendrograma guardado en: {output_path}")
     except Exception as e:
         print(f"Error al generar dendrograma para {method_name}: {str(e)}")
-
+        
 def plot_similarity_heatmap(similarity_matrix, abstract_ids, max_size=100, random_seed=42):
     """
     Plot and save similarity matrix as a heatmap.

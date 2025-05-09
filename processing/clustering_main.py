@@ -13,7 +13,7 @@ def main():
     """Execute the hierarchical clustering pipeline."""
     try:
         # Load and preprocess data
-        abstracts, abstract_ids = load_bibtex(BIBTEX_FILE_PATH, sample_size=None, random_seed=42)
+        abstracts, abstract_ids = load_bibtex(BIBTEX_FILE_PATH, sample_size=1.0, random_seed=42)
         if not abstracts:
             print("No se pudo continuar debido a la falta de abstracts.")
             return
