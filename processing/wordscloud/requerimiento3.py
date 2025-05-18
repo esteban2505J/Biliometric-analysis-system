@@ -245,7 +245,8 @@ def main(df):
 # --- EJEMPLO DE USO ---
 
 if __name__ == "__main__":
-    # Verifica si se pasó un argumento de línea de comandos
+
+    
     if len(sys.argv) > 1:
         path_file = sys.argv[1]
     else:

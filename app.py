@@ -40,6 +40,15 @@ def run_estadisticas():
         gr.update(value="✅ Análisis estadístico realizado.")
     )
 
+def cargar_imagenes_ranking():
+    ranking_dir = os.path.join(GRAPHICS_DIR, "ranking")
+    images = []
+    if os.path.exists(ranking_dir):
+        for fname in os.listdir(ranking_dir):
+            if fname.endswith(".png"):
+                images.append(os.path.join(ranking_dir, fname))
+    return images
+
 def run_nube_palabras():
     valido, msg = validar_archivo()
     if not valido:
@@ -65,6 +74,25 @@ def run_clustering():
             if fname.endswith(".png"):
                 images.append(os.path.join(clustering_dir, fname))
     return images, gr.update(value="✅ Clustering realizado.")
+
+
+
+ranking_gallery = gr.Gallery(label="📊 Gráficos Estadísticos (Ranking)")
+
+def mostrar_galeria_ranking():
+    return cargar_imagenes_ranking()
+
+
+
+def cargar_imagenes_counted_words():
+    counted_words_dir = os.path.join(GRAPHICS_DIR, "counted_words")
+    images = []
+    if os.path.exists(counted_words_dir):
+        for fname in os.listdir(counted_words_dir):
+            if fname.endswith(".png"):
+                images.append(os.path.join(counted_words_dir, fname))
+    return images
+
 
 with gr.Blocks() as demo:
     gr.Markdown("# Sistema de Análisis Bibliométrico y Computacional")
@@ -99,13 +127,26 @@ with gr.Blocks() as demo:
     tipo_prod_df = gr.Dataframe(label="📌 Cantidad por Tipo de Producto")
     tipo_prod_anio_df = gr.Dataframe(label="📌 Conteo por Tipo de Producto y Año")
     journals_df = gr.Dataframe(label="📌 Top 15 Journals")
+    ranking_gallery = gr.Gallery(label="Gráficos Estadísticos")
     estad_status = gr.Textbox(label="Estado análisis estadístico")
 
     estad_btn.click(
         fn=run_estadisticas,
         outputs=[autores_df, publicaciones_df, tipo_prod_df, tipo_prod_anio_df, journals_df, estad_status]
     )
+    estad_btn.click(
+        fn=mostrar_galeria_ranking,
+        outputs=ranking_gallery
+    )
 
+    counted_words_gallery = gr.Gallery(label="📈 Gráficos de Palabras Contadas")
+
+    estad_btn.click(
+        fn=cargar_imagenes_counted_words,
+        outputs=counted_words_gallery
+    )
+
+    
     nube_output = gr.Gallery(label="Nube de Palabras y Co-ocurrencia")
     nube_status = gr.Textbox(label="Estado nube de palabras")
     nube_btn.click(fn=run_nube_palabras, outputs=[nube_output, nube_status])
