@@ -12,17 +12,28 @@ def save_uploaded_file(file_path):
     shutil.copy(file_path, save_path)
     return save_path
 
+import pandas as pd
+
 def run_estadisticas():
     # Ejecuta el análisis estadístico
     ruta = os.path.join(OUTPUT_DIR, "unified_cleaned.bib")
     os.system(f"python processing/estatistics/ranking.py {ruta}")
-    
-    # Devuelve las imágenes generadas
-    images = []
-    for fname in os.listdir(GRAPHICS_DIR):
-        if fname.endswith(".png"):
-            images.append(os.path.join(GRAPHICS_DIR, fname))
-    return images
+
+    # Lee los resultados generados por ranking.py
+    top15_autores = pd.read_csv("graphics/ranking/top15_autores.csv")
+    publicaciones_top15 = pd.read_csv("graphics/ranking/publicaciones_top15_autores_por_anio.csv", index_col=0)
+    cantidad_tipo_producto = pd.read_csv("graphics/ranking/cantidad_tipo_producto.csv")
+    conteo_tipo_producto_anio = pd.read_csv("graphics/ranking/conteo_tipo_producto_anio.csv", index_col=0)
+    top15_journals = pd.read_csv("graphics/ranking/top15_journals.csv")
+
+    return (
+        top15_autores,
+        publicaciones_top15,
+        cantidad_tipo_producto,
+        conteo_tipo_producto_anio,
+        top15_journals
+    )
+
 
 def run_nube_palabras():
     # Ejecuta el análisis de nube de palabras
@@ -70,11 +81,23 @@ with gr.Blocks() as demo:
         nube_btn = gr.Button("Nube de Palabras")
         cluster_btn = gr.Button("Clustering")
 
+    # Salidas para las tablas
+    autores_df = gr.Dataframe(label="📌 Top 15 Primeros Autores")
+    publicaciones_df = gr.Dataframe(label="📌 Publicaciones de los Top 15 Autores por Año")
+    tipo_prod_df = gr.Dataframe(label="📌 Cantidad por Tipo de Producto")
+    tipo_prod_anio_df = gr.Dataframe(label="📌 Conteo por Tipo de Producto y Año")
+    journals_df = gr.Dataframe(label="📌 Top 15 Journals")
+
+
     estad_output = gr.Gallery(label="Resultados Estadísticos")
     nube_output = gr.Gallery(label="Nube de Palabras y Co-ocurrencia")
     cluster_output = gr.Gallery(label="Resultados de Clustering")
 
-    estad_btn.click(fn=run_estadisticas, outputs=estad_output)
+    estad_btn.click(
+        fn=run_estadisticas,
+        outputs=[autores_df, publicaciones_df, tipo_prod_df, tipo_prod_anio_df, journals_df]
+    )
+
     nube_btn.click(fn=run_nube_palabras, outputs=nube_output)
     cluster_btn.click(fn=run_clustering, outputs=cluster_output)
 

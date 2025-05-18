@@ -146,3 +146,9 @@ if 'publisher' in df.columns:
     plt.close()
 else:
     print("\n⚠️ No se encontró columna 'publisher' en el archivo BibTeX.")
+
+tabla_autores.to_csv(os.path.join(output_folder, "top15_autores.csv"), index=False)
+autores_anio.to_csv(os.path.join(output_folder, "publicaciones_top15_autores_por_anio.csv"))
+tabla_tipo.to_csv(os.path.join(output_folder, "cantidad_tipo_producto.csv"), index=False)
+tipo_anio.to_csv(os.path.join(output_folder, "conteo_tipo_producto_anio.csv"))
+tabla_journals.to_csv(os.path.join(output_folder, "top15_journals.csv"), index=False)
