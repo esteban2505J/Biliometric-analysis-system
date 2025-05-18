@@ -21,6 +21,7 @@ import os
 import warnings
 import traceback
 import random
+import sys
 
 # Suppress warnings
 warnings.filterwarnings("ignore")
@@ -641,7 +642,14 @@ class HierarchicalClusteringAbstracts:
 def main():
     """Main function to execute the hierarchical clustering pipeline."""
     # Define BibTeX file path
-    bibtex_file = r'C:\Users\newUs\Documents\uni\projects\bibliometricProject\output\unified_cleaned.bib'
+    if len(sys.argv) > 1:
+        bibtex_file = sys.argv[1]
+    else:
+        bibtex_file = 'output/unified_cleaned.bib'  # Ruta relativa por defecto
+
+    # Initialize the clustering class
+    clusterer = HierarchicalClusteringAbstracts(bibtex_file, sample_size=None, random_seed=42)
+    #bibtex_file = r'C:\Users\newUs\Documents\uni\projects\bibliometricProject\output\unified_cleaned.bib'
     
     # Initialize the clustering class
     clusterer = HierarchicalClusteringAbstracts(bibtex_file, sample_size=None, random_seed=42)

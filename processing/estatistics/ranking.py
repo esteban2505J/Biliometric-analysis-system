@@ -6,8 +6,16 @@ import seaborn as sns
 import os
 
 # Ruta del archivo
-path_file = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\output\unified_cleaned.bib"
-output_folder = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\graphics\ranking"
+
+import sys
+if len(sys.argv) > 1:
+    path_file = sys.argv[1]
+else:
+    path_file = "output/unified_cleaned.bib"
+
+#path_file = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\output\unified_cleaned.bib"
+#output_folder = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\graphics\ranking"
+output_folder = "graphics/ranking"
 os.makedirs(output_folder, exist_ok=True)
 
 # Función para graficar y guardar ranking horizontal

@@ -7,6 +7,7 @@ from wordcloud import WordCloud
 import networkx as nx
 import itertools
 import bibtexparser
+import sys
 
 # --- CONFIGURACIÓN ---
 output_folder = "graphics/requerimiento3"
@@ -244,7 +245,13 @@ def main(df):
 # --- EJEMPLO DE USO ---
 
 if __name__ == "__main__":
-    path_file = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\output\unified_cleaned.bib"
+    # Verifica si se pasó un argumento de línea de comandos
+    if len(sys.argv) > 1:
+        path_file = sys.argv[1]
+    else:
+        path_file = "output/unified_cleaned.bib"
+
+    #path_file = r"C:\Users\newUs\Documents\uni\projects\bibliometricProject\output\unified_cleaned.bib"
     
     # Validar si el archivo existe
     if os.path.exists(path_file):

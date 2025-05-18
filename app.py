@@ -5,16 +5,18 @@ import shutil
 OUTPUT_DIR = "output"
 GRAPHICS_DIR = "graphics"
 
-def save_uploaded_file(file):
-    # Guarda el archivo subido en output/unified_cleaned.bib
+
+def save_uploaded_file(file_path):
+    # file_path es una ruta a un archivo temporal
     save_path = os.path.join(OUTPUT_DIR, "unified_cleaned.bib")
-    with open(file.name, "rb") as src, open(save_path, "wb") as dst:
-        shutil.copyfileobj(src, dst)
+    shutil.copy(file_path, save_path)
     return save_path
 
 def run_estadisticas():
     # Ejecuta el análisis estadístico
-    os.system("python processing/estatistics/ranking.py")
+    ruta = os.path.join(OUTPUT_DIR, "unified_cleaned.bib")
+    os.system(f"python processing/estatistics/ranking.py {ruta}")
+    
     # Devuelve las imágenes generadas
     images = []
     for fname in os.listdir(GRAPHICS_DIR):
@@ -55,7 +57,7 @@ with gr.Blocks() as demo:
         upload_btn = gr.Button("Cargar archivo")
         upload_output = gr.Textbox(label="Estado de carga")
 
-    upload_btn.click(
+        upload_btn.click(
         fn=lambda f: "Archivo cargado correctamente." if save_uploaded_file(f) else "Error al cargar.",
         inputs=file_input,
         outputs=upload_output
@@ -76,4 +78,4 @@ with gr.Blocks() as demo:
     nube_btn.click(fn=run_nube_palabras, outputs=nube_output)
     cluster_btn.click(fn=run_clustering, outputs=cluster_output)
 
-demo.launch()
+demo.launch(share=True)
