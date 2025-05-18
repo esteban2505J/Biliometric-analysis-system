@@ -23,6 +23,9 @@ import traceback
 import random
 import sys
 
+CLUSTERING_OUTPUT_DIR = "graphics/clustering"
+os.makedirs(CLUSTERING_OUTPUT_DIR, exist_ok=True)
+
 # Suppress warnings
 warnings.filterwarnings("ignore")
 
@@ -422,8 +425,8 @@ class HierarchicalClusteringAbstracts:
             plt.xlabel('Abstracts', fontsize=16)
             plt.ylabel('Distancia', fontsize=16)
             plt.tight_layout()
-            
-            plt.savefig(f'dendrograma_{method_name.lower()}.png', dpi=300, bbox_inches='tight')
+
+            plt.savefig(os.path.join(CLUSTERING_OUTPUT_DIR, f'dendrograma_{method_name.lower()}.png'), dpi=300, bbox_inches='tight')
             plt.close()
             return self
         except Exception as e:
@@ -467,8 +470,8 @@ class HierarchicalClusteringAbstracts:
             plt.xticks(rotation=90, fontsize=8)
             plt.yticks(rotation=0, fontsize=8)
             plt.tight_layout()
-            
-            plt.savefig('mapa_calor_similitud.png', dpi=300, bbox_inches='tight')
+
+            plt.savefig(os.path.join(CLUSTERING_OUTPUT_DIR, 'mapa_calor_similitud.png'), dpi=300, bbox_inches='tight')
             plt.close()
             return self
         except Exception as e:
@@ -598,8 +601,8 @@ class HierarchicalClusteringAbstracts:
             plt.xlabel('Clusters', fontsize=14)
             plt.ylabel('Categorías', fontsize=14)
             plt.tight_layout()
-            
-            plt.savefig(f'distribucion_categorias_{algorithm_key}.png', dpi=300, bbox_inches='tight')
+
+            plt.savefig(os.path.join(CLUSTERING_OUTPUT_DIR, f'distribucion_categorias_{algorithm_key}.png'), dpi=300, bbox_inches='tight')
             plt.close()
         except Exception as e:
             print(f"Error al visualizar distribución de categorías para {algorithm_name}: {str(e)}")
@@ -689,7 +692,7 @@ def main():
                 'Cluster_AGNES': clusters2
             }
             df = pd.DataFrame(data)
-            df.to_csv('cluster_assignments.csv', index=False)
+            df.to_csv(os.path.join(CLUSTERING_OUTPUT_DIR, 'cluster_assignments.csv'), index=False)
             print("Cluster assignments saved to 'cluster_assignments.csv'.")
         
     except Exception as e:

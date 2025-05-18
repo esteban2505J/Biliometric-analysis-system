@@ -89,14 +89,13 @@ with gr.Blocks() as demo:
     journals_df = gr.Dataframe(label="📌 Top 15 Journals")
 
 
-    estad_output = gr.Gallery(label="Resultados Estadísticos")
-    nube_output = gr.Gallery(label="Nube de Palabras y Co-ocurrencia")
-    cluster_output = gr.Gallery(label="Resultados de Clustering")
-
     estad_btn.click(
         fn=run_estadisticas,
         outputs=[autores_df, publicaciones_df, tipo_prod_df, tipo_prod_anio_df, journals_df]
     )
+
+    nube_output = gr.Gallery(label="Nube de Palabras y Co-ocurrencia")
+    cluster_output = gr.Gallery(label="Resultados de Clustering")
 
     nube_btn.click(fn=run_nube_palabras, outputs=nube_output)
     cluster_btn.click(fn=run_clustering, outputs=cluster_output)
