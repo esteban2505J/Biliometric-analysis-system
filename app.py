@@ -15,10 +15,12 @@ def save_uploaded_file(file_path):
     archivo_cargado["status"] = True
     return save_path
 
+
 def validar_archivo():
     if not archivo_cargado["status"]:
         return False, "⚠️ Por favor, sube primero el archivo BibTeX unificado."
     return True, ""
+
 
 def run_estadisticas():
     valido, msg = validar_archivo()
@@ -40,7 +42,26 @@ def run_estadisticas():
         gr.update(value="✅ Análisis estadístico realizado.")
     )
 
+
+
+def cargar_imagenes_counted_words():
+    valido, msg = validar_archivo()
+    if not valido:
+        return [], gr.update(value=msg)
+    counted_words_dir = os.path.join(GRAPHICS_DIR, "counted_words")
+    images = []
+    if os.path.exists(counted_words_dir):
+        for fname in os.listdir(counted_words_dir):
+            if fname.endswith(".png"):
+                images.append(os.path.join(counted_words_dir, fname))
+    return images
+
+
+
 def cargar_imagenes_ranking():
+    valido, msg = validar_archivo()
+    if not valido:
+        return [], gr.update(value=msg)
     ranking_dir = os.path.join(GRAPHICS_DIR, "ranking")
     images = []
     if os.path.exists(ranking_dir):
@@ -77,21 +98,15 @@ def run_clustering():
 
 
 
-ranking_gallery = gr.Gallery(label="📊 Gráficos Estadísticos (Ranking)")
+ranking_gallery = gr.Gallery(label="Gráficos Estadísticos ")
 
 def mostrar_galeria_ranking():
+    valido, msg = validar_archivo()
+    if not valido:
+        return [], gr.update(value=msg)
     return cargar_imagenes_ranking()
 
 
-
-def cargar_imagenes_counted_words():
-    counted_words_dir = os.path.join(GRAPHICS_DIR, "counted_words")
-    images = []
-    if os.path.exists(counted_words_dir):
-        for fname in os.listdir(counted_words_dir):
-            if fname.endswith(".png"):
-                images.append(os.path.join(counted_words_dir, fname))
-    return images
 
 
 with gr.Blocks() as demo:
@@ -154,5 +169,9 @@ with gr.Blocks() as demo:
     cluster_output = gr.Gallery(label="Resultados de Clustering")
     cluster_status = gr.Textbox(label="Estado clustering")
     cluster_btn.click(fn=run_clustering, outputs=[cluster_output, cluster_status])
+
+
+    gr.Markdown("---")
+    gr.Markdown("**Trabajo realizado por:**  \nIsmenia Marcela Guevara Ortiz, Juan Esteban Ramirez Tabares")
 
 demo.launch(share=True)
