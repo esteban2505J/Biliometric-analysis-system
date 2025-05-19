@@ -29,9 +29,10 @@ def run_estadisticas():
     ruta = os.path.join(OUTPUT_DIR, "unified_cleaned.bib")
     os.system(f"python processing/estatistics/ranking.py {ruta}")
     top15_autores = pd.read_csv("graphics/ranking/top15_autores.csv")
-    publicaciones_top15 = pd.read_csv("graphics/ranking/publicaciones_top15_autores_por_anio.csv", index_col=0)
+    publicaciones_top15 = pd.read_csv("graphics/ranking/publicaciones_top15_autores_por_anio.csv")
     cantidad_tipo_producto = pd.read_csv("graphics/ranking/cantidad_tipo_producto.csv")
-    conteo_tipo_producto_anio = pd.read_csv("graphics/ranking/conteo_tipo_producto_anio.csv", index_col=0)
+    # Quita index_col=0 aquí también:
+    conteo_tipo_producto_anio = pd.read_csv("graphics/ranking/conteo_tipo_producto_anio.csv")
     top15_journals = pd.read_csv("graphics/ranking/top15_journals.csv")
     return (
         top15_autores,
