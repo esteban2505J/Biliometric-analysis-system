@@ -10,6 +10,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
+
+load_dotenv()
+
 # Configure Download Folder
 DOWNLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "..", "downloads/IEE")
 if not os.path.exists(DOWNLOAD_FOLDER):
@@ -35,6 +38,7 @@ chrome_options.add_argument("--no-sandbox")  # Sometimes helps with GPU issues
 def scrape_IEE():
 
     """Scrapes IEE, downloads BibTeX files, and iterates through pages."""
+   
     
     # Load environment variables
     EMAIL = os.getenv("EMAIL")

@@ -8,6 +8,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+load_dotenv()
+
 # Configure Download Folder
 DOWNLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "..", "downloads/science")
 if not os.path.exists(DOWNLOAD_FOLDER):

@@ -705,4 +705,4 @@ if __name__ == '__main__':
     except ModuleNotFoundError:
         print("Error: 'bibtexparser' module not found. Please install it using 'pip install bibtexparser'.")
         exit(1)
-    main()
+    main()                                  
